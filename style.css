@@ -1,0 +1,196 @@
+:root{
+    --rotate-speed: 20s;
+    --count: 6;
+    --easing: linear;
+    --radius: 160px;
+    --card-width: 140px;
+    --max-size: 520px;
+}
+.header{
+    background-color:#01847F;
+    color:#FFFFFF;
+    width:100%;
+    padding: 12px 16px;
+}
+
+
+body{background-color:#FFAA93;margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;flex-direction: column;gap:16px;}
+
+.void{width:100%;max-width:var(--max-size);margin:auto;position:relative;aspect-ratio:1/1;}
+
+/* spin the whole group around its center */
+ul.card-list{
+    list-style:none;margin:0;padding:0;width:100%;height:100%;position:relative;z-index:1;
+    transform-origin:50% 50%;
+    animation: spin var(--rotate-speed) var(--easing) infinite;
+    will-change: transform;
+    border-radius: 50%;
+}
+.card:hover{
+    height:60px;
+    width:150px;
+    font-size:1.5em
+}
+ ul.card-list:has(.card:hover),
+    ul.card-list:has(.card:hover) .card {
+        animation-play-state: paused !important;
+    }
+
+    /* JS fallback: toggles this class to pause animations */
+    ul.card-list.paused,
+    ul.card-list.paused .card {
+        animation-play-state: paused !important;
+    }
+
+/* put each li at the center; nth-child rotates+translates it to the ring */
+ul.card-list li{
+    text-align:center;
+    justify-content: center;
+    position:absolute;left:50%;top:50%;margin:0;padding:0;
+    transform-origin:center center;
+    transform: translate(-50%,-50%); /* baseline center */
+}
+
+/* evenly distribute items around the circle */
+ul.card-list li:nth-child(1){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*0)) translateX(var(--radius)); }
+ul.card-list li:nth-child(2){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*1)) translateX(var(--radius)); }
+ul.card-list li:nth-child(3){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*2)) translateX(var(--radius)); }
+ul.card-list li:nth-child(4){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*3)) translateX(var(--radius)); }
+ul.card-list li:nth-child(5){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*4)) translateX(var(--radius)); }
+ul.card-list li:nth-child(6){ transform: translate(-50%,-50%) rotate(calc((360deg/var(--count))*5)) translateX(var(--radius)); }
+
+/* card stays visually upright by applying an opposite rotation animation
+   that mirrors the UL spin exactly (same duration + easing) */
+.card{
+
+    width:var(--card-width);
+    display:flex;flex-direction:column;align-items:flex-start;
+    padding:12px 16px;gap:8px;background:#01847F;border-radius:12px;
+    box-shadow:0 4px 12px rgba(70,0,255,0.08),0 12px 24px rgba(165,135,255,0.06);
+    color:white;
+    transform-origin:center center;
+    /* no static transform here — let li place the card */
+    transform: none;
+    animation: counter-spin var(--rotate-speed) var(--easing) infinite;
+    will-change: transform;
+    text-align:center;
+    backface-visibility: hidden;
+}
+.card-desc{
+  display:none;
+  box-sizing:border-box;
+  width: 80%;
+  margin:18px auto;
+  padding:0;
+  background:#01847F;
+  color:white;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.07);
+  overflow:hidden;
+  transition: padding .22s ease, opacity .18s ease;
+  opacity:0;
+}
+section{
+    margin-top:10%;
+    width:100%;
+}
+section h2{
+    color:#FFAA93;
+    
+}
+/* visible state */
+.card-desc.visible{
+  display:block;
+  padding:20px;
+  opacity:1;
+  /* opzionale: imposta altezza massima se vuoi limitare lo spazio */
+  max-height:520px;
+}
+a{display:block;text-decoration:none;color:inherit;height:48px;overflow:hidden;align-items:center;
+    justify-content:center;}
+
+
+footer{
+
+    width:100%;
+    background-color:#01847F;
+    color:#FFFFFF;
+    text-align: center;
+    justify-content: center;
+    padding:40px;
+}
+.language-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+/* mirror of spin so visual rotation cancels out for each card */
+@keyframes counter-spin{ from{transform:rotate(0deg)} to{transform:rotate(0deg)} }
+
+.center-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;aspect-ratio:1/1;background:#3B2ED0;border-radius:50%;z-index:2;
+    box-shadow:0 18px 36px -18 rgba(12,5,46,0.3),0 30px 60px -12 rgba(12,5,46,0.25);}
+@media (prefers-reduced-motion: reduce){
+    ul.card-list, .card { animation: none !important; }
+}
+
+/* touch devices only — pause animations on coarse/touch input */
+@media (hover: none) and (pointer: coarse) {
+    :root{ --rotate-speed: 0s; } /* stop continuous spinning on touch */
+    ul.card-list{ animation-play-state: paused; }
+    /* compact layout for touch */
+    :root{
+        --radius: clamp(60px, 20vmin, 120px);
+        --card-width: clamp(90px, 25vmin, 120px);
+        --center-size: clamp(50px, 15vmin, 80px);
+        --max-size: clamp(280px, 85vmin, 420px);
+        --font-size: clamp(12px, 2.6vmin, 14px);
+    }
+}
+
+/* small viewports (phones) — scale layout but keep animation enabled */
+@media (max-width: 520px){
+    :root{
+        --radius: clamp(70px, 22vmin, 140px);
+        --card-width: clamp(90px, 20vmin, 130px);
+        --center-size: clamp(50px, 16vmin, 80px);
+        --max-size: clamp(280px, 90vmin, 520px);
+        --font-size: clamp(12px, 2.4vmin, 14px);
+        
+        /* do not change --rotate-speed here so orbit keeps moving */
+    }
+    body{
+        font-size:0.8em;
+    }
+    .card:hover{
+        height:50px;
+        width:90px;
+        font-size:1.2em;
+        
+    }
+    .center-circle{
+        width:80px;
+    }
+    .card{
+        width:80px;
+        height:40px;
+    }
+}
+
+/* optional: change count/layout for very small screens to stack cards vertically */
+@media (max-width: 360px){
+    .card{font-size: 0.7em;}
+    ul.card-list{ animation:none; } /* explicit stop on very small screens if desired */
+    ul.card-list li{ position: static; transform:none; display:block; margin:8px auto; width:min(80%, var(--card-width)); }
+    .void{ aspect-ratio: auto; height:auto; padding:24px 0; }
+    .center-circle{ display:none; }
+}
